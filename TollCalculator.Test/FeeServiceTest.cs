@@ -163,7 +163,7 @@ namespace TollCalculator.Test
         }
 
         /// <summary>
-        /// Test Week end - not a holiday
+        /// Exceptions
         /// </summary>
         [TestMethod]
         public async Task FeesService_GetTotalFee_Error_Returens_Total()
@@ -171,7 +171,6 @@ namespace TollCalculator.Test
             var appender = new log4net.Appender.MemoryAppender();
             BasicConfigurator.Configure(appender);
 
-            var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
             List<DateTime> timeIntervals = new List<DateTime>();
 
@@ -182,6 +181,49 @@ namespace TollCalculator.Test
 
             var logEntries = appender.GetEvents();
             Assert.IsTrue(logEntries.Any());
+        }
+
+        /// <summary>
+        /// Total equals possible max total
+        /// </summary>
+        [TestMethod]
+        public async Task FeesService_GetTotalFee_Equals_PossibleMaxValue_Returens_Total()
+        {
+            var total = 60.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 27, 2021");
+
+            timeIntervals.Add(date + new TimeSpan(7, 05, 0));//16 =>added
+            timeIntervals.Add(date + new TimeSpan(8, 25, 0));//22 => added
+            timeIntervals.Add(date + new TimeSpan(15, 45, 0));//22 => added
+
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            Assert.AreEqual(total, resut);
+        }
+
+        /// <summary>
+        /// Total greater possible max total
+        /// </summary>
+        [TestMethod]
+        public async Task FeesService_GetTotalFee_GreaterThan_PossibleMaxValue_Returens_Total()
+        {
+            var total = 60.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 27, 2021");
+
+            timeIntervals.Add(date + new TimeSpan(7, 05, 0));//16 =>added
+            timeIntervals.Add(date + new TimeSpan(8, 25, 0));//22 => added
+            timeIntervals.Add(date + new TimeSpan(15, 40, 0));//22 => added
+            timeIntervals.Add(date + new TimeSpan(16, 45, 0));//22 => added
+
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            Assert.AreEqual(total, resut);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace TollCalculator.Services
             try
             {
                 DateTime intervalStart = recordedTimes[0];
+                decimal possibleMaxTotal = Convert.ToDecimal(ConfigurationManager.AppSettings["MaxTotal"]);
 
                 if (HoliDayHelper.IsAHoliday(intervalStart) || HoliDayHelper.IsAWeekEnd(intervalStart)) return total;
 
@@ -63,13 +65,19 @@ namespace TollCalculator.Services
                     time = hrs + minutes;
 
                     total += GetFee(hrs + minutes, feesRangeDTOList);
+
+                    if (total>= possibleMaxTotal) // maximum value for total 
+                    {
+                        total = possibleMaxTotal;
+                        break;
+                    }
                 }
 
                 return total;
             }
             catch (Exception ex)
             {
-                log.Error(ex.Message + ex.StackTrace);
+                log.Error($"Message =>{ex.Message} Description=> {ex.StackTrace}");
                 return total;
             }
         }

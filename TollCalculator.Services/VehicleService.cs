@@ -18,15 +18,5 @@ namespace TollCalculator.Services
 
             return isApplicable;
         }
-
-        public VehicleDTO SetVehicel()
-        {
-            return new VehicleDTO()
-            {
-                NumberPlate = "AAA",
-                VehicleId = 1,
-                VehicleType = 12
-            };
-        }
     }
 }

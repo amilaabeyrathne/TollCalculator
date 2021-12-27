@@ -23,9 +23,9 @@ namespace TollCalculator.Web.Controllers
         private static readonly ILog Log = LogManager.GetLogger(typeof(FeesController));
 
         #endregion
-        public FeesController()
+        public FeesController(IFeesService _feesService)
         {
-            this.feesService = new FeesService();
+            this.feesService = _feesService;
         }
 
         #region API methods

@@ -1,8 +1,9 @@
+using System.Web.Http;
 using System.Web.Mvc;
 using TollCalculator.Services;
 using TollCalculator.Services.Interfaces;
 using Unity;
-using Unity.Mvc5;
+using Unity.WebApi;
 
 namespace TollCalculator.Web
 {
@@ -11,11 +12,10 @@ namespace TollCalculator.Web
         public static void RegisterComponents()
         {
 			var container = new UnityContainer();
-            
-            container.RegisterType<IVehicleService, VehicleService>();
             container.RegisterType<IFeesService, FeesService>();
+            container.RegisterType<IVehicleService, VehicleService>();
 
-            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
+            GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }
 }
