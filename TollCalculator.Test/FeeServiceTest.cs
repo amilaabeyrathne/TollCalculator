@@ -1,5 +1,6 @@
 ﻿using log4net.Config;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,13 @@ namespace TollCalculator.Test
     {
         private IFeesService feesService;
         private List<FeesRangeDTO> feesRangeLsit;
+        private List<FeesRangeDTO> SecondFeesRangeLsit;
 
         [TestInitialize]
         public void Init()
         {
-            this.feesService = new FeesService();
+            var moqService = Mock.Of<IVehicleService>();
+            this.feesService = new FeesService(moqService);
             feesRangeLsit = new List<FeesRangeDTO>()
             {
               new FeesRangeDTO(){ StartTime=6.0 ,EndTime=6.29, Fee =9 },
@@ -27,6 +30,21 @@ namespace TollCalculator.Test
               new FeesRangeDTO(){ StartTime=7.0 ,EndTime=7.59, Fee =22 },
               new FeesRangeDTO(){ StartTime=8.0 ,EndTime=8.29, Fee =16 },
               new FeesRangeDTO(){ StartTime=8.30 ,EndTime=14.59, Fee =9 },
+              new FeesRangeDTO(){ StartTime=15.0 ,EndTime=15.29, Fee =16 },
+              new FeesRangeDTO(){ StartTime=15.30 ,EndTime=16.59, Fee =22 },
+              new FeesRangeDTO(){ StartTime=17.0 ,EndTime=17.59, Fee =16 },
+              new FeesRangeDTO(){ StartTime=18.0 ,EndTime=18.29, Fee =9 },
+              new FeesRangeDTO(){ StartTime=18.30 ,EndTime=23.59, Fee =0 },
+              new FeesRangeDTO(){ StartTime=0.0 ,EndTime=5.59, Fee =0 },
+            };
+
+            SecondFeesRangeLsit = new List<FeesRangeDTO>()
+            {
+              new FeesRangeDTO(){ StartTime=6.0 ,EndTime=6.59, Fee =9 },
+              new FeesRangeDTO(){ StartTime=7.0 ,EndTime=7.59, Fee =22 },
+              new FeesRangeDTO(){ StartTime=8.0 ,EndTime=8.29, Fee =16 },
+              new FeesRangeDTO(){ StartTime=8.30 ,EndTime=12.59, Fee =12 },
+              new FeesRangeDTO(){ StartTime=13.0 ,EndTime=14.59, Fee =9 },
               new FeesRangeDTO(){ StartTime=15.0 ,EndTime=15.29, Fee =16 },
               new FeesRangeDTO(){ StartTime=15.30 ,EndTime=16.59, Fee =22 },
               new FeesRangeDTO(){ StartTime=17.0 ,EndTime=17.59, Fee =16 },
@@ -64,7 +82,7 @@ namespace TollCalculator.Test
         /// added once in hour after noon
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_Afternoon_Returens_Total()
+        public async Task FeesService_GetTotalFee_Afternoon_Returns_Total()
         {
             var total = 27.0M;
             var vehicleType = 20;// vehicle type enum
@@ -88,7 +106,7 @@ namespace TollCalculator.Test
         /// All in an one hour
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_OneHour_Returens_Total()
+        public async Task FeesService_GetTotalFee_OneHour_Returns_Total()
         {
             var total = 16.0M;
             var vehicleType = 20;// vehicle type enum
@@ -112,7 +130,7 @@ namespace TollCalculator.Test
         /// Test holidays
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_HoliDay_Returens_Total() 
+        public async Task FeesService_GetTotalFee_HoliDay_Returns_Total() 
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -130,7 +148,7 @@ namespace TollCalculator.Test
         /// Test holidays - not a holiday
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_NotHoliDay_Returens_Total()
+        public async Task FeesService_GetTotalFee_NotHoliDay_Returns_Total()
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -148,7 +166,7 @@ namespace TollCalculator.Test
         /// Test Week end - not a holiday
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_WeekEnd_Returens_Total()
+        public async Task FeesService_GetTotalFee_WeekEnd_Returns_Total()
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -166,7 +184,7 @@ namespace TollCalculator.Test
         /// Exceptions
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_Error_Returens_Total()
+        public async Task FeesService_GetTotalFee_Error_Returns_Total()
         {
             var appender = new log4net.Appender.MemoryAppender();
             BasicConfigurator.Configure(appender);
@@ -187,7 +205,7 @@ namespace TollCalculator.Test
         /// Total equals possible max total
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_Equals_PossibleMaxValue_Returens_Total()
+        public async Task FeesService_GetTotalFee_Equals_PossibleMaxValue_Returns_Total()
         {
             var total = 60.0M;
             var vehicleType = 20;// vehicle type enum
@@ -208,7 +226,7 @@ namespace TollCalculator.Test
         /// Total greater possible max total
         /// </summary>
         [TestMethod]
-        public async Task FeesService_GetTotalFee_GreaterThan_PossibleMaxValue_Returens_Total()
+        public async Task FeesService_GetTotalFee_GreaterThan_PossibleMaxValue_Returns_Total()
         {
             var total = 60.0M;
             var vehicleType = 20;// vehicle type enum
@@ -225,5 +243,31 @@ namespace TollCalculator.Test
 
             Assert.AreEqual(total, resut);
         }
+
+        #region test second fee renges
+
+        // <summary>
+        /// added once in hour after noon
+        /// </summary>
+        [TestMethod]
+        public async Task FeesService_GetTotalFee_SecoendRengeList_Returns_Total()
+        {
+            var total = 37.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 27, 2021");
+
+            timeIntervals.Add(date + new TimeSpan(6, 32, 0));//9 =>added
+            timeIntervals.Add(date + new TimeSpan(7, 25, 0));//22 =>not
+            timeIntervals.Add(date + new TimeSpan(8, 27, 0));//16 => added
+            timeIntervals.Add(date + new TimeSpan(10, 20, 0));//212 => added
+
+            var resut = await this.feesService.GetTotalFee(timeIntervals, SecondFeesRangeLsit, vehicleType);
+
+            Assert.AreEqual(total, resut);
+        }
+
+        #endregion
     }
 }

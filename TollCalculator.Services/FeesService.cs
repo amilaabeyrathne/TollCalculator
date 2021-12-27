@@ -16,9 +16,9 @@ namespace TollCalculator.Services
         private readonly IVehicleService vehicleService;
         private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public FeesService()
+        public FeesService(IVehicleService _vehicleService)
         {
-            vehicleService = new VehicleService();
+            this.vehicleService = _vehicleService;
         }
 
         /// <summary>
