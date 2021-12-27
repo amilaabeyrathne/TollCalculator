@@ -39,7 +39,7 @@ namespace TollCalculator.Web.Controllers
                 {
                     responsModel.ResponseCode = (int)ResonseEnum.Error;
                     Log.Error($"Model is null");
-                    return responsModel;
+                    return  responsModel;
                 }
 
                 List<FeesRangeDTO> feesRanges = new List<FeesRangeDTO>();
@@ -63,9 +63,10 @@ namespace TollCalculator.Web.Controllers
             {
                 responsModel.ResponseCode = (int)ResonseEnum.Error;
                 Log.Error($"Message =>{ex.Message} Description=> {ex.StackTrace}");
+                return  responsModel;
             }
 
-            return responsModel;
+            return responsModel; 
         }
 
         #endregion
