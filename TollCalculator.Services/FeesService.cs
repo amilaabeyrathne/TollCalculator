@@ -19,13 +19,14 @@ namespace TollCalculator.Services
         {
             vehicleService = new VehicleService();
         }
+
         /// <summary>
         /// Time is needed in 24 hrs
         /// </summary>
         /// <param name="recordedTimes"></param>
         /// <param name="feesRangeDTOList"></param>
         /// <returns></returns>
-        public decimal GetTotalFee(List<DateTime> recordedTimes, List<FeesRangeDTO> feesRangeDTOList, int? vehicleType)
+        public  async Task<decimal> GetTotalFee(List<DateTime> recordedTimes, List<FeesRangeDTO> feesRangeDTOList, int? vehicleType)
         {
             decimal total = 0.0M;
 

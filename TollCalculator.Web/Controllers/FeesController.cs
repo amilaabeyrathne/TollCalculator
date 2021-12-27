@@ -1,56 +1,73 @@
-﻿using System;
+﻿using AutoMapper;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using TollCalculator.Common.DTOs;
+using TollCalculator.Common.Enums;
 using TollCalculator.Services;
 using TollCalculator.Services.Interfaces;
+using TollCalculator.Web.Models;
 
 namespace TollCalculator.Web.Controllers
 {
     public class FeesController : ApiController
     {
+        #region clas variables
+
         private readonly IFeesService feesService;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(FeesController));
+
+        #endregion
         public FeesController()
         {
             this.feesService = new FeesService();
         }
 
-        public string Get()
+        #region API methods
+        public async Task<ResponsModel> Post(FeeModel fees)
         {
-            var  feesRangeLsit = new List<FeesRangeDTO>()
+            ResponsModel responsModel = new ResponsModel();
+
+            try
             {
-              new FeesRangeDTO(){ StartTime=6.0 ,EndTime=6.29, Fee =9 },
-              new FeesRangeDTO(){ StartTime=6.30 ,EndTime=6.59, Fee =16 },
-              new FeesRangeDTO(){ StartTime=7.0 ,EndTime=7.59, Fee =22 },
-              new FeesRangeDTO(){ StartTime=8.0 ,EndTime=8.29, Fee =16 },
-              new FeesRangeDTO(){ StartTime=8.30 ,EndTime=14.59, Fee =9 },
-              new FeesRangeDTO(){ StartTime=15.0 ,EndTime=15.29, Fee =16 },
-              new FeesRangeDTO(){ StartTime=15.30 ,EndTime=16.59, Fee =22 },
-              new FeesRangeDTO(){ StartTime=17.0 ,EndTime=17.59, Fee =16 },
-              new FeesRangeDTO(){ StartTime=18.0 ,EndTime=18.29, Fee =9 },
-              new FeesRangeDTO(){ StartTime=18.30 ,EndTime=23.59, Fee =0 },
-              new FeesRangeDTO(){ StartTime=0.0 ,EndTime=5.59, Fee =0 },
-            };
+                if (fees == null)
+                {
+                    responsModel.ResponseCode = (int)ResonseEnum.Error;
+                    Log.Error($"Model is null");
+                    return responsModel;
+                }
 
-            var vehicleType = 20;// vehicle type enum
-            List<DateTime> timeIntervals = new List<DateTime>();
+                List<FeesRangeDTO> feesRanges = new List<FeesRangeDTO>();
 
-            var date = DateTime.Parse("Dec 27, 2021");
+                feesRanges = Mapper.Map<List<FeesRangeModel>, List<FeesRangeDTO>>(fees.FeesRangeList);
 
-            timeIntervals.Add(date + new TimeSpan(6, 55, 0));//16 =>added
-            timeIntervals.Add(date + new TimeSpan(7, 0, 0));//22 => not
-            timeIntervals.Add(date + new TimeSpan(7, 25, 0));//22 => not
-            timeIntervals.Add(date + new TimeSpan(7, 57, 0));//22 => added
-            timeIntervals.Add(date + new TimeSpan(8, 0, 0));//16 => not
-            timeIntervals.Add(date + new TimeSpan(8, 35, 0));//9 => not
+                List<DateTime> timeIntervals = new List<DateTime>();
 
-            var total = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+                var date = DateTime.Parse(fees.Date);
 
-            return total.ToString();
+                foreach (var interval in fees.TimeIntervalList)
+                {
+                    timeIntervals.Add(date + new TimeSpan(interval.Hours, interval.Minutes, 0));
+                }
+
+                var total = await this.feesService.GetTotalFee(timeIntervals, feesRanges, fees.VehicleType);
+                responsModel.TotalFee = total;
+                responsModel.ResponseCode = (int)ResonseEnum.success;
+            }
+            catch (Exception ex)
+            {
+                responsModel.ResponseCode = (int)ResonseEnum.Error;
+                Log.Error($"Message =>{ex.Message} Description=> {ex.StackTrace}");
+            }
+
+            return responsModel;
         }
-       
+
+        #endregion
     }
 }

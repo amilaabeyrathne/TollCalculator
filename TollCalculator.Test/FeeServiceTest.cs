@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TollCalculator.Common.DTOs;
 using TollCalculator.Services;
 using TollCalculator.Services.Interfaces;
@@ -39,7 +40,7 @@ namespace TollCalculator.Test
         /// added once in hour
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_OnceInAnHour_Returens_Total()
+        public async Task FeesService_GetTotalFee_OnceInAnHour_Returens_Total()
         {
             var total = 38.0M;
             var vehicleType = 20;// vehicle type enum
@@ -54,7 +55,7 @@ namespace TollCalculator.Test
             timeIntervals.Add(date + new TimeSpan(8, 0, 0));//16 => not
             timeIntervals.Add(date + new TimeSpan(8, 35, 0));//9 => not
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut =  await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -63,7 +64,7 @@ namespace TollCalculator.Test
         /// added once in hour after noon
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_Afternoon_Returens_Total()
+        public async Task FeesService_GetTotalFee_Afternoon_Returens_Total()
         {
             var total = 27.0M;
             var vehicleType = 20;// vehicle type enum
@@ -78,7 +79,7 @@ namespace TollCalculator.Test
             timeIntervals.Add(date + new TimeSpan(18, 35, 0));//16 => not
             timeIntervals.Add(date + new TimeSpan(23, 26, 0));//16 => added
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -87,7 +88,7 @@ namespace TollCalculator.Test
         /// All in an one hour
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_OneHour_Returens_Total()
+        public async Task FeesService_GetTotalFee_OneHour_Returens_Total()
         {
             var total = 16.0M;
             var vehicleType = 20;// vehicle type enum
@@ -102,7 +103,7 @@ namespace TollCalculator.Test
             timeIntervals.Add(date + new TimeSpan(15, 55, 0));//16 => not
             timeIntervals.Add(date + new TimeSpan(16, 0, 0));//16 => added
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -111,7 +112,7 @@ namespace TollCalculator.Test
         /// Test holidays
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_HoliDay_Returens_Total() 
+        public async Task FeesService_GetTotalFee_HoliDay_Returens_Total() 
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -120,7 +121,7 @@ namespace TollCalculator.Test
             var date = DateTime.Parse("Dec 24, 2021");
             timeIntervals.Add(date + new TimeSpan(15, 00, 0));
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -129,7 +130,7 @@ namespace TollCalculator.Test
         /// Test holidays - not a holiday
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_NotHoliDay_Returens_Total()
+        public async Task FeesService_GetTotalFee_NotHoliDay_Returens_Total()
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -138,7 +139,7 @@ namespace TollCalculator.Test
             var date = DateTime.Parse("Dec 27, 2021");
             timeIntervals.Add(date + new TimeSpan(15, 00, 0));
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreNotEqual(total, resut);
         }
@@ -147,7 +148,7 @@ namespace TollCalculator.Test
         /// Test Week end - not a holiday
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_WeekEnd_Returens_Total()
+        public async Task FeesService_GetTotalFee_WeekEnd_Returens_Total()
         {
             var total = 0.0M;
             var vehicleType = 20;// vehicle type enum
@@ -156,7 +157,7 @@ namespace TollCalculator.Test
             var date = DateTime.Parse("Dec 4, 2021");
             timeIntervals.Add(date + new TimeSpan(15, 00, 0));
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -165,7 +166,7 @@ namespace TollCalculator.Test
         /// Test Week end - not a holiday
         /// </summary>
         [TestMethod]
-        public void FeesService_GetTotalFee_Error_Returens_Total()
+        public async Task FeesService_GetTotalFee_Error_Returens_Total()
         {
             var appender = new log4net.Appender.MemoryAppender();
             BasicConfigurator.Configure(appender);
@@ -176,7 +177,8 @@ namespace TollCalculator.Test
 
             var date = DateTime.Parse("Dec 4, 2021");
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+            var resut = await 
+                this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             var logEntries = appender.GetEvents();
             Assert.IsTrue(logEntries.Any());

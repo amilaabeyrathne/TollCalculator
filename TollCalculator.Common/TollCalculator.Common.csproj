@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="DTOs\FeesRangeDTO.cs" />
     <Compile Include="DTOs\VehicleDTO.cs" />
+    <Compile Include="Enums\ResonseEnum.cs" />
     <Compile Include="Enums\TollFreeVehicleTypesEnum.cs" />
     <Compile Include="Enums\VehicleTyepsEnum.cs" />
     <Compile Include="Helpers\HoliDayHelper.cs" />
