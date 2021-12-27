@@ -10,6 +10,6 @@ namespace TollCalculator.Services.Interfaces
     public interface IVehicleService
     {
         VehicleDTO SetVehicel();
-        bool IsTollApplicable(int? vehicleType);
+        bool IsTollNotApplicable(int? vehicleType);
     }
 }

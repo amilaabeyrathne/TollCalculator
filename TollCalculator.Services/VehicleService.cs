@@ -11,7 +11,7 @@ namespace TollCalculator.Services
 {
     public class VehicleService : IVehicleService
     {
-        public bool IsTollApplicable(int? vehicleType)
+        public bool IsTollNotApplicable(int? vehicleType)
         {
             if (vehicleType == null) return false;
             bool isApplicable  = Enum.IsDefined(typeof(TollFreeVehicleTypesEnum), (TollFreeVehicleTypesEnum)vehicleType);

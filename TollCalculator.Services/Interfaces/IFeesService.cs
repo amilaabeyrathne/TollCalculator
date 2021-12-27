@@ -9,7 +9,7 @@ namespace TollCalculator.Services.Interfaces
 {
     public interface IFeesService
     {
-        decimal GetTotalFee(List<DateTime> recordedTimes, List<FeesRangeDTO> feesRangeDTOList);
+        decimal GetTotalFee(List<DateTime> recordedTimes, List<FeesRangeDTO> feesRangeDTOList, int? vehicleType);
        
     }
 }

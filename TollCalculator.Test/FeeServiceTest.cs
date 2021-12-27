@@ -1,6 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using log4net.Config;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TollCalculator.Common.DTOs;
 using TollCalculator.Services;
 using TollCalculator.Services.Interfaces;
@@ -40,17 +42,19 @@ namespace TollCalculator.Test
         public void FeesService_GetTotalFee_OnceInAnHour_Returens_Total()
         {
             var total = 38.0M;
-
+            var vehicleType = 20;// vehicle type enum
             List<DateTime> timeIntervals = new List<DateTime>();
 
-            timeIntervals.Add(DateTime.ParseExact("06:55", "H:m", null));//16 =>added
-            timeIntervals.Add(DateTime.ParseExact("07:00", "H:m", null));//22 => not
-            timeIntervals.Add(DateTime.ParseExact("07:25", "H:m", null));//22 => not
-            timeIntervals.Add(DateTime.ParseExact("07:57", "H:m", null));//22 => added
-            timeIntervals.Add(DateTime.ParseExact("08:00", "H:m", null));//16 => not
-            timeIntervals.Add(DateTime.ParseExact("08:35", "H:m", null));//9 => not
+            var date = DateTime.Parse("Dec 27, 2021");
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit);
+            timeIntervals.Add(date+ new TimeSpan(6, 55, 0));//16 =>added
+            timeIntervals.Add(date + new TimeSpan(7, 0, 0));//22 => not
+            timeIntervals.Add(date + new TimeSpan(7, 25, 0));//22 => not
+            timeIntervals.Add(date + new TimeSpan(7, 57, 0));//22 => added
+            timeIntervals.Add(date + new TimeSpan(8, 0, 0));//16 => not
+            timeIntervals.Add(date + new TimeSpan(8, 35, 0));//9 => not
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -62,17 +66,19 @@ namespace TollCalculator.Test
         public void FeesService_GetTotalFee_Afternoon_Returens_Total()
         {
             var total = 27.0M;
-
+            var vehicleType = 20;// vehicle type enum
             List<DateTime> timeIntervals = new List<DateTime>();
 
-            timeIntervals.Add(DateTime.ParseExact("13:30", "H:m", null));//9 =>added
-            timeIntervals.Add(DateTime.ParseExact("14:29", "H:m", null));//9 => not
-            timeIntervals.Add(DateTime.ParseExact("14:31", "H:m", null));//9 => added
-            timeIntervals.Add(DateTime.ParseExact("18:20", "H:m", null));//9 => added
-            timeIntervals.Add(DateTime.ParseExact("18:35", "H:m", null));//0 => not
-            timeIntervals.Add(DateTime.ParseExact("23:26", "H:m", null));//0 => added
+            var date = DateTime.Parse("Dec 27, 2021");
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit);
+            timeIntervals.Add(date + new TimeSpan(13, 30, 0));//9 =>added
+            timeIntervals.Add(date + new TimeSpan(14, 29, 0));//9 =>not
+            timeIntervals.Add(date + new TimeSpan(14, 31, 0));//9 => added
+            timeIntervals.Add(date + new TimeSpan(18, 20, 0));//22 => added
+            timeIntervals.Add(date + new TimeSpan(18, 35, 0));//16 => not
+            timeIntervals.Add(date + new TimeSpan(23, 26, 0));//16 => added
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
         }
@@ -84,19 +90,96 @@ namespace TollCalculator.Test
         public void FeesService_GetTotalFee_OneHour_Returens_Total()
         {
             var total = 16.0M;
-
+            var vehicleType = 20;// vehicle type enum
             List<DateTime> timeIntervals = new List<DateTime>();
 
-            timeIntervals.Add(DateTime.ParseExact("15:00", "H:m", null));//16 =>added
-            timeIntervals.Add(DateTime.ParseExact("15:12", "H:m", null));//16=> not
-            timeIntervals.Add(DateTime.ParseExact("15:31", "H:m", null));//22 => not
-            timeIntervals.Add(DateTime.ParseExact("15:45", "H:m", null));//22 => not
-            timeIntervals.Add(DateTime.ParseExact("15:55", "H:m", null));//22=> not
-            timeIntervals.Add(DateTime.ParseExact("16:00", "H:m", null));//22 => not
+            var date = DateTime.Parse("Dec 27, 2021");
 
-            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit);
+            timeIntervals.Add(date + new TimeSpan(15, 00, 0));//9 =>added
+            timeIntervals.Add(date + new TimeSpan(15, 12, 0));//9 =>not
+            timeIntervals.Add(date + new TimeSpan(15, 31, 0));//9 => not
+            timeIntervals.Add(date + new TimeSpan(15, 45, 0));//22 => not
+            timeIntervals.Add(date + new TimeSpan(15, 55, 0));//16 => not
+            timeIntervals.Add(date + new TimeSpan(16, 0, 0));//16 => added
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
 
             Assert.AreEqual(total, resut);
+        }
+
+        /// <summary>
+        /// Test holidays
+        /// </summary>
+        [TestMethod]
+        public void FeesService_GetTotalFee_HoliDay_Returens_Total() 
+        {
+            var total = 0.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 24, 2021");
+            timeIntervals.Add(date + new TimeSpan(15, 00, 0));
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            Assert.AreEqual(total, resut);
+        }
+
+        /// <summary>
+        /// Test holidays - not a holiday
+        /// </summary>
+        [TestMethod]
+        public void FeesService_GetTotalFee_NotHoliDay_Returens_Total()
+        {
+            var total = 0.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 27, 2021");
+            timeIntervals.Add(date + new TimeSpan(15, 00, 0));
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            Assert.AreNotEqual(total, resut);
+        }
+
+        /// <summary>
+        /// Test Week end - not a holiday
+        /// </summary>
+        [TestMethod]
+        public void FeesService_GetTotalFee_WeekEnd_Returens_Total()
+        {
+            var total = 0.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 4, 2021");
+            timeIntervals.Add(date + new TimeSpan(15, 00, 0));
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            Assert.AreEqual(total, resut);
+        }
+
+        /// <summary>
+        /// Test Week end - not a holiday
+        /// </summary>
+        [TestMethod]
+        public void FeesService_GetTotalFee_Error_Returens_Total()
+        {
+            var appender = new log4net.Appender.MemoryAppender();
+            BasicConfigurator.Configure(appender);
+
+            var total = 0.0M;
+            var vehicleType = 20;// vehicle type enum
+            List<DateTime> timeIntervals = new List<DateTime>();
+
+            var date = DateTime.Parse("Dec 4, 2021");
+
+            var resut = this.feesService.GetTotalFee(timeIntervals, feesRangeLsit, vehicleType);
+
+            var logEntries = appender.GetEvents();
+            Assert.IsTrue(logEntries.Any());
         }
     }
 }

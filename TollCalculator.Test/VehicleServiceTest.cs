@@ -8,7 +8,7 @@ using TollCalculator.Services.Interfaces;
 namespace TollCalculator.Test
 {
     [TestClass]
-    public class VehicalServiceTest
+    public class VehicleServiceTest
     {
         private  IVehicleService vehicleService;
 
